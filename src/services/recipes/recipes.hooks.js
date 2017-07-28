@@ -15,19 +15,17 @@ const authorSchema = {
   }
 };
 
-const likerSchema = {
-  include: {
-    service: 'users',
-    nameAs: 'likers',
-    parentField: 'likedBy',
-    childField: '_id'
-  }
-};
-
 const restrict = [
   authenticate('jwt'),
   restrictToAuthenticated(),
 ];
+
+const restrictToOwners = [
+  ...restrict,
+  restrictToOwner({
+    ownerField: 'authorId'
+  })
+]
 
 module.exports = {
   before: {
@@ -38,15 +36,14 @@ module.exports = {
       ...restrict,
       associateCurrentUser({ as: 'authorId' }),
     ],
-    update: [...restrict],
-    patch: [...restrict],
-    remove: [...restrict]
+    update: [...restrictToOwners],
+    patch: [...restrictToOwners],
+    remove: [...restrictToOwners]
   },
 
   after: {
     all: [
       populate({ schema: authorSchema }),
-      // populate({ schema: likerSchema }),
     ],
     find: [],
     get: [],
