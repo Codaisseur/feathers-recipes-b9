@@ -3,6 +3,7 @@
 const { authenticate } = require('feathers-authentication').hooks;
 const { restrictToOwner, associateCurrentUser, restrictToAuthenticated } = require('feathers-authentication-hooks');
 const { populate } = require('feathers-hooks-common');
+const restrictToOwnerButMakeLikable = require('../../hooks/make-likable');
 
 // Configure where we will get the author data from (the users service),
 // how to fetch it (by authorId), and where to put it (author).
@@ -22,10 +23,9 @@ const restrict = [
 
 const restrictToOwners = [
   ...restrict,
-  restrictToOwner({
-    ownerField: 'authorId'
-  })
+  restrictToOwnerButMakeLikable,
 ]
+
 
 module.exports = {
   before: {
